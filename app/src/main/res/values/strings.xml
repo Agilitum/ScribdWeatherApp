@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ScribdWeatherApp</string>
+    <string name="provider">Yahoo Weather API</string>
 </resources>
