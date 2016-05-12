@@ -96,15 +96,11 @@ public class MainActivity extends AppCompatActivity {
 			public void onClick(View v) {
 //				handleProgressBar(true);
 
-				city = cityInput.getText().toString();
-
 				//invoke Yahoo api here
-				YahooAPIClient.getWeather(woeid, "°F", requestQueue, new YahooAPIClient
+				YahooAPIClient.getWeather(woeid, "c", requestQueue, new YahooAPIClient
 					.WeatherClientListener() {
 					@Override
 					public void onWeatherResponse(Weather weather) {
-						//TODO: new intent here with all the data
-						//Log.d("SwA", "Weather ["+weather+"] - Cond ["+weather.condition+"] - Temp ["+weather.condition.temp+"]");
 						int code = weather.condition.code;
 
 						textViewDescrWeather.setText(weather.condition.description);

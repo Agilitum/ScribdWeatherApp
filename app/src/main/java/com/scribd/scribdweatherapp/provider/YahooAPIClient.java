@@ -30,7 +30,7 @@ public class YahooAPIClient {
 	public static String YAHOO_WEATHER_URL = "http://weather.yahooapis.com/forecastrss";
 
 	//TODO: get correct key
-	private static String APPID = "APP_ID_KEY";
+	private static String APPID = "dj0yJmk9Zm9NbFFudWtwVmtOJmQ9WVdrOWMxcENaemhMTldrbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD0yZQ--";
 
 	public static List<CityResult> getCityList(String cityName) {
 		List<CityResult> result = new ArrayList<CityResult>();
@@ -177,8 +177,7 @@ public class YahooAPIClient {
 	private static String makeQueryCityURL(String cityName) {
 		cityName = cityName.replaceAll(" ", "%20");
 		return YAHOO_GEO_URL + "/places.q(" + cityName + "%2A);count=" + Config.MAX_CITY_RESULT +
-			"?appid="
-			+ APPID;
+			"?appid="	+ APPID;
 	}
 
 	private static String makeWeatherURL(String woeid, String unit) {
