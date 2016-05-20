@@ -1,6 +1,7 @@
 package com.scribd.scribdweatherapp;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -20,36 +21,58 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.scribd.scribdweatherapp.model.CityResult;
 import com.scribd.scribdweatherapp.model.Weather;
+import com.scribd.scribdweatherapp.provider.ScribdWeatherImageProvider;
+import com.scribd.scribdweatherapp.provider.WeatherImageProvider;
 import com.scribd.scribdweatherapp.provider.YahooAPIClient;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class MainActivity extends AppCompatActivity {
 
 	private String city;
-	private AutoCompleteTextView cityInput;
 	private String woeid;
 	private String cityName;
 	private String country;
 
 	private RequestQueue requestQueue;
 
-	private TextView textViewDescrWeather;
-	private TextView textViewLocation;
-	private TextView textViewTemperature;
-	private TextView textViewTempUnit;
-	private TextView textViewTempMin;
-	private TextView textViewTempMax;
-	private TextView textViewHum;
-	private TextView textViewWindSpeed;
-	private TextView textViewWindDeg;
-	private TextView textViewPress;
-	private TextView textViewPressStatus;
-	private TextView textViewVisibility;
-	private ImageView weatherImage;
-	private TextView textViewSunrise;
-	private TextView textViewSunset;
+	@Bind(R.id.button_get_weather_activtiy_main)
+	Button weatherRequestButton;
+
+	@Bind(R.id.autoCompleteText_city_name_activity_main)
+	AutoCompleteTextView cityInput;
+
+	@Bind(R.id.descrWeather)
+	TextView textViewDescrWeather;
+	@Bind(R.id.location)
+	TextView textViewLocation;
+	@Bind(R.id.temp)
+	TextView textViewTemperature;
+	@Bind(R.id.tempUnit)
+	TextView textViewTempUnit;
+	@Bind(R.id.tempMinMax)
+	TextView textViewTempMinMax;
+	@Bind(R.id.humidity)
+	TextView textViewHum;
+	@Bind(R.id.windSpeedAndDegree)
+	TextView textViewWindSpeedAndDegree;
+	@Bind(R.id.pressure)
+	TextView textViewPress;
+	@Bind(R.id.pressureStat)
+	TextView textViewPressStatus;
+	@Bind(R.id.visibility)
+	TextView textViewVisibility;
+	@Bind(R.id.imgWeather)
+	ImageView weatherImage;
+	@Bind(R.id.sunrise)
+	TextView textViewSunrise;
+	@Bind(R.id.sunset)
+	TextView textViewSunset;
 
 
 	@Override
@@ -59,23 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
 		requestQueue = Volley.newRequestQueue(getApplicationContext());
 
-		textViewDescrWeather = (TextView) findViewById(R.id.descrWeather);
-		textViewLocation = (TextView) findViewById(R.id.location);
-		textViewTemperature = (TextView) findViewById(R.id.temp);
-		textViewTempUnit = (TextView) findViewById(R.id.tempUnit);
-		textViewTempMin = (TextView) findViewById(R.id.tempMin);
-		textViewTempMax = (TextView) findViewById(R.id.tempMax);
-		textViewHum = (TextView) findViewById(R.id.humidity);
-		textViewWindSpeed = (TextView) findViewById(R.id.windSpeed);
-		textViewWindDeg = (TextView) findViewById(R.id.windDeg);
-		textViewPress = (TextView) findViewById(R.id.pressure);
-		textViewPressStatus = (TextView) findViewById(R.id.pressureStat);
-		textViewVisibility = (TextView) findViewById(R.id.visibility);
-		weatherImage = (ImageView) findViewById(R.id.imgWeather);
-		textViewSunrise = (TextView) findViewById(R.id.sunrise);
-		textViewSunset = (TextView) findViewById(R.id.sunset);
-
-		cityInput = (AutoCompleteTextView) findViewById(R.id.autoCompleteText_city_name_activity_main);
+		ButterKnife.bind(this);
 
 		CityAdapter cityAdapter = new CityAdapter(this, null);
 		cityInput.setAdapter(cityAdapter);
@@ -90,76 +97,6 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 
-		Button weatherRequestButton = (Button) findViewById(R.id.button_get_weather_activtiy_main);
-		weatherRequestButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-//				handleProgressBar(true);
-
-				//invoke Yahoo api here
-				YahooAPIClient.getWeather(woeid, "c", requestQueue, new YahooAPIClient
-					.WeatherClientListener() {
-					@Override
-					public void onWeatherResponse(Weather weather) {
-						int code = weather.condition.code;
-
-						textViewDescrWeather.setText(weather.condition.description);
-						textViewLocation.setText(weather.location.name + "," + weather.location.region + "," + weather.location.country);
-						// Temperature data
-						textViewTemperature.setText("" + weather.condition.temp);
-
-						int resId = getResource(weather.units.temperature, weather.condition.temp);
-						((TextView) findViewById(R.id.lineTxt)).setBackgroundResource(resId);
-
-						textViewTempUnit.setText(weather.units.temperature);
-						textViewTempMin.setText("" + weather.forecast.tempMin + " " + weather.units.temperature);
-						textViewTempMax.setText("" + weather.forecast.tempMax + " " + weather.units.temperature);
-
-						// Humidity data
-						textViewHum.setText("" + weather.atmosphere.humidity + " %");
-
-						// Wind data
-						textViewWindSpeed.setText("" + weather.wind.speed + " " + weather.units.speed);
-						textViewWindDeg.setText("" + weather.wind.direction + "°");
-
-						// Pressure data
-						textViewPress.setText("" + weather.atmosphere.pressure + " " + weather.units.pressure);
-						int status = weather.atmosphere.rising;
-						String iconStat = "";
-						switch (status) {
-							case 0 :
-								iconStat = "-";
-								break;
-							case 1 :
-								iconStat = "+";
-								break;
-							case 2 :
-								iconStat = "-";
-								break;
-						};
-						textViewPressStatus.setText(iconStat);
-
-						// Visibility
-						textViewVisibility.setText("" + weather.atmosphere.visibility + " " + weather.units.distance);
-
-						// Astronomy
-						textViewSunrise.setText(weather.astronomy.sunRise);
-						textViewSunset.setText(weather.astronomy.sunSet);
-
-						// Update
-//						IWeatherImageProvider provider = new WeatherImageProvider();
-//						provider.getImage(code, requestQueue, new IWeatherImageProvider.WeatherImageListener() {
-//							@Override
-//							public void onImageReady(Bitmap image) {
-//								weatherImage.setImageBitmap(image);
-//							}
-//						});
-
-					}
-//					handleProgressBar(false);
-				});
-			}
-		});
 	}
 
 //	private void handleProgressBar(boolean visible) {
@@ -172,6 +109,76 @@ public class MainActivity extends AppCompatActivity {
 //			refreshItem.setActionView(null);
 //	}
 
+
+	@OnClick(R.id.button_get_weather_activtiy_main)
+	protected void onClick(){
+		//TODO:
+		//handleProgressBar(true);
+
+		//invoke Yahoo api here
+		YahooAPIClient.getWeather(woeid, "c", requestQueue, new YahooAPIClient
+			.WeatherClientListener() {
+			@Override
+			public void onWeatherResponse(Weather weather) {
+				int code = weather.condition.code;
+
+				textViewDescrWeather.setText(weather.condition.description);
+				textViewLocation.setText(weather.location.name + "," + weather.location.region + "," + weather.location.country);
+				// Temperature data
+				textViewTemperature.setText("" + weather.condition.temp);
+
+				int resId = getResource(weather.units.temperature, weather.condition.temp);
+				((TextView) findViewById(R.id.lineTxt)).setBackgroundResource(resId);
+
+				textViewTempUnit.setText(weather.units.temperature);
+				textViewTempMinMax.setText("" + weather.forecast.tempMin + " " + weather.units.temperature +
+					" - " + "" + weather.forecast.tempMax + " " + weather.units.temperature);
+
+				// Humidity data
+				textViewHum.setText("" + weather.atmosphere.humidity + " %");
+
+				// Wind data
+				textViewWindSpeedAndDegree.setText("" + weather.wind.speed + " " + weather.units.speed + " at " + "" + weather.wind.direction + "°");
+
+				// Pressure data
+				textViewPress.setText("" + weather.atmosphere.pressure + " " + weather.units.pressure);
+				int status = weather.atmosphere.rising;
+				String iconStat = "";
+				switch (status) {
+					case 0:
+						iconStat = "-";
+						break;
+					case 1:
+						iconStat = "+";
+						break;
+					case 2:
+						iconStat = "-";
+						break;
+				}
+				textViewPressStatus.setText(iconStat);
+
+				// Visibility
+				textViewVisibility.setText("" + weather.atmosphere.visibility + " " + weather.units.distance);
+
+				// Astronomy
+				textViewSunrise.setText(weather.astronomy.sunRise);
+				textViewSunset.setText(weather.astronomy.sunSet);
+
+				// Weather Image
+				ScribdWeatherImageProvider provider = new WeatherImageProvider();
+				provider.getImage(code, requestQueue, new ScribdWeatherImageProvider
+					.WeatherImageListener() {
+					@Override
+					public void onImageReady(Bitmap image) {
+						weatherImage.setImageBitmap(image);
+					}
+				});
+
+			}
+			//TODO:
+//  handleProgressBar(false);
+		});
+	}
 
 	private float convertToC(String unit, float val) {
 		if (unit.equalsIgnoreCase("°C"))
@@ -186,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
 		int resId = 0;
 		if (temp < 10)
 			resId = R.drawable.line_shape_blue;
-		else if (temp >= 10 && temp <=24)
+		else if (temp >= 10 && temp <= 24)
 			resId = R.drawable.line_shape_green;
 		else if (temp > 25)
 			resId = R.drawable.line_shape_red;
@@ -194,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
 		return resId;
 
 	}
+
 
 	private class CityAdapter extends ArrayAdapter<CityResult> implements Filterable {
 

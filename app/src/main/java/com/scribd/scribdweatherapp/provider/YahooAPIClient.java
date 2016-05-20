@@ -27,9 +27,8 @@ import java.util.List;
 public class YahooAPIClient {
 
 	public static String YAHOO_GEO_URL = "http://where.yahooapis.com/v1";
-	public static String YAHOO_WEATHER_URL = "http://weather.yahooapis.com/forecastrss";
+	public static String YAHOO_WEATHER_URL = "https://query.yahooapis.com/v1/public/yql?";
 
-	//TODO: get correct key
 	private static String APPID = "dj0yJmk9Zm9NbFFudWtwVmtOJmQ9WVdrOWMxcENaemhMTldrbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD0yZQ--";
 
 	public static List<CityResult> getCityList(String cityName) {
@@ -181,7 +180,7 @@ public class YahooAPIClient {
 	}
 
 	private static String makeWeatherURL(String woeid, String unit) {
-		return  YAHOO_WEATHER_URL + "?w=" + woeid + "&u=" + unit;
+		return YAHOO_WEATHER_URL + "q=select+%2A+from+weather.forecast+where+woeid%3D" + woeid + "&format=xml";
 	}
 
 	/* Pubblic listener interface */
