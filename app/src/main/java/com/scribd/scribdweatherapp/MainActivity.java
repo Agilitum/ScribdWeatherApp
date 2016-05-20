@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
@@ -74,6 +76,12 @@ public class MainActivity extends AppCompatActivity {
 	@Bind(R.id.sunset)
 	TextView textViewSunset;
 
+	@Bind(R.id.progressBar)
+	ProgressBar progressBar;
+
+	@Bind(R.id.weatherContent)
+	RelativeLayout weatherContent;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -99,27 +107,17 @@ public class MainActivity extends AppCompatActivity {
 
 	}
 
-//	private void handleProgressBar(boolean visible) {
-//		if (refreshItem == null)
-//			return ;
-//
-//		if (visible)
-//			refreshItem.setActionView(R.layout.progress_bar);
-//		else
-//			refreshItem.setActionView(null);
-//	}
-
-
 	@OnClick(R.id.button_get_weather_activtiy_main)
 	protected void onClick(){
-		//TODO:
-		//handleProgressBar(true);
+		handleProgressBar(true);
 
 		//invoke Yahoo api here
 		YahooAPIClient.getWeather(woeid, "c", requestQueue, new YahooAPIClient
 			.WeatherClientListener() {
 			@Override
 			public void onWeatherResponse(Weather weather) {
+				handleProgressBar(false);
+
 				int code = weather.condition.code;
 
 				textViewDescrWeather.setText(weather.condition.description);
@@ -175,9 +173,18 @@ public class MainActivity extends AppCompatActivity {
 				});
 
 			}
-			//TODO:
-//  handleProgressBar(false);
 		});
+	}
+
+	private void handleProgressBar(boolean visible) {
+		if (visible){
+			progressBar.setVisibility(View.VISIBLE);
+			weatherContent.setVisibility(View.GONE);
+		} else{
+			progressBar.setVisibility(View.GONE);
+			weatherContent.setVisibility(View.VISIBLE);
+
+		}
 	}
 
 	private float convertToC(String unit, float val) {

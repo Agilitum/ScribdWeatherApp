@@ -95,7 +95,7 @@ public class YahooAPIClient {
 		}, new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError volleyError) {
-
+				volleyError.printStackTrace();
 			}
 		});
 
